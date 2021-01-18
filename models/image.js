@@ -20,6 +20,11 @@ const imageSchema = new Schema({
         type: String,
         required: true
     },
+    userAccess: {
+        type: Schema.Types.ObjectId,
+        ref: 'User',
+        required: true
+    }
 });
 
 //Implementing this model allows you to perform CRUD operations
