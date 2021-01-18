@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 const fileUpload = require('express-fileupload');
 const mongoose = require("mongoose");
 const cors = require('cors');
-const cookieParser = require('cookie-parser');
 const path = require('path');
 
 //Loads environment variables from the keys.env
@@ -17,7 +16,6 @@ app.use(bodyParser.urlencoded({ extended: false })); //bodyparser middleware
 app.use(bodyParser.json());
 app.use(cors());
 app.use(fileUpload());
-app.use(cookieParser('82e4e438a0305cabf61f9354e3b535af'));
 
 // Serve static files from the React app
 app.use(express.static(path.join(__dirname, 'client/build')));
