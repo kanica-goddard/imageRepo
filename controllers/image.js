@@ -2,27 +2,17 @@ const express = require("express");
 const router = express.Router();
 const imageModel = require("../models/image");
 const fs = require('fs');
+const verifyToken = require("../middlewares/auth");
 
 //Routes
 
 //Shows all images
-router.get("/images", (req, res) => {
+router.get("/images/:id", [verifyToken], (req, res) => {
+    const id = req.params.id;
+    console.log("Get images for: " + id);
     imageModel
-        .find({})
+        .find({ userAccess: id })
         .then((images) => {
-            //   const mappedProducts = products.map((product) => {
-            //     return {
-            //       id: product._id,
-            //       productName: product.productName,
-            //       description: product.description,
-            //       quantity: product.quantity,
-            //       productImage: product.productImage,
-            //       category: product.category,
-            //       price: product.price,
-            //       isBestSeller: product.isBestSeller,
-            //     };
-            //   });
-
             res.send(images);
         })
         .catch((err) =>
@@ -30,47 +20,60 @@ router.get("/images", (req, res) => {
         );
 });
 
-//Add a new image
-router.post("/image", (req, res) => {
-    console.log(req.files.files);
+const saveImage = async (req, uploadedImage) => {
+    try {
+        console.log("Save image: " + uploadedImage);
 
-    imageModel.findOne({ name: req.files.files.name }).then(image => {
-        //Filename already exists
-        res.status(409).send("Filename already exists.");
-    }).then(error => {
+        //Build object
+        const newImage = {
+            name: uploadedImage.name,
+            src: `/images/${uploadedImage.name}`,
+            size: uploadedImage.size,
+            userAccess: req.body.id
+        }
+
+        //Save image model
+        const Image = new imageModel(newImage);
+        let savedImage = await Image.save();
+        console.log("Added to DB");
+        console.log(savedImage);
+
         //Move image to images folder
-        req.files.files.mv(`public/images/${req.files.files.name}`).then(() => {
+        uploadedImage.mv(`public/images/${uploadedImage.name}`).then(() => {
             console.log("Added to images folder");
-
-            //Build object
-            const newImage = {
-                name: req.files.files.name,
-                src: `/images/${req.files.files.name}`,
-                size: req.files.files.size
-            }
-
-            //Save image model
-            const image = new imageModel(newImage);
-            image.save()
-                .then((image) => {
-                    console.log("Added to DB");
-                    res.send(image);
-                })
         })
-    })
+        // });
+        console.log("Saved Image", savedImage)
+        return savedImage;
 
+    } catch (error) {
+        console.log(`Error: ${error}`);
+    }
+}
 
+//Add image(s)
+router.post("/images", [verifyToken], async (req, res) => {
+    let imagesAdded = [];
 
-});
+    if (req.files.images.length > 1) {
+        for (let uploadedImage of req.files.images) {
+            const imageAdded = await saveImage(req, uploadedImage);
+            imagesAdded.push(imageAdded);
+        }
 
-//Modify an existing image
-router.put("/image", (req, res) => {
-
+        res.send(imagesAdded);
+    }
+    else {
+        const imageAdded = await saveImage(req, req.files.images);
+        imagesAdded.push(imageAdded);
+        res.send(imagesAdded);
+    }
 });
 
 //Remove an existing image
 router.delete("/image/:id", (req, res) => {
     const id = req.params.id;
+
     imageModel.findById(id).then(image => {
         //Delete local image file
         fs.unlink("./public" + image.src, (error) => {
@@ -81,8 +84,8 @@ router.delete("/image/:id", (req, res) => {
 
                 //Delete from DB
                 imageModel.findByIdAndDelete(id).then(data => {
-                    console.log("Deleted from DB");
-                    res.send({ id: id });
+                    console.log("Deleted from DB: " + data);
+                    res.json({ id: data._id });
                 });
             }
         });
