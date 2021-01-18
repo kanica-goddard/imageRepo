@@ -104,7 +104,7 @@ function Gallery({ signOut }) {
             return (
               <div className="image-cell" key={index}>
                 <div className="image-wrapper">
-                  <img alt={image.src} src={"http://localhost:3200/" + image.src} />
+                  <img alt={image.src} src={image.src} />
                   <Button destructive onClick={(e) => deleteImage(e, image._id)}>
                     <Icon source={DeleteMajor} />
                   </Button>
