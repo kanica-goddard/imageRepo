@@ -27,8 +27,6 @@ router.get("/images/:id", [verifyToken], (req, res) => {
  */
 const saveImage = async (req, uploadedImage) => {
     try {
-        console.log("Save image: " + uploadedImage);
-
         //Build object
         const newImage = {
             name: uploadedImage.name,
@@ -47,8 +45,7 @@ const saveImage = async (req, uploadedImage) => {
         uploadedImage.mv(`public/image_files/${uploadedImage.name}`).then(() => {
             console.log("Added to images folder");
         })
-        // });
-        console.log("Saved Image", savedImage)
+
         return savedImage;
 
     } catch (error) {
