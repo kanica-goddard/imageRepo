@@ -21,7 +21,7 @@ app.use(fileUpload());
 app.use(express.static(path.join(__dirname, 'client/build')));
 
 // Serve images
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Load controllers
 const authController = require("./controllers/auth");
