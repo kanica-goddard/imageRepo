@@ -1,131 +1,44 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React from "react";
 import "@shopify/polaris/dist/styles.css";
 import enTranslations from "@shopify/polaris/locales/en.json";
-import {
-  AppProvider,
-  Frame,
-  Page,
-  Card,
-  Button,
-  Icon,
-  Heading,
-  Toast,
-} from "@shopify/polaris";
-import { AddImageMajor, DeleteMajor } from "@shopify/polaris-icons";
+import { AppProvider, Frame } from "@shopify/polaris";
+import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 
 import "./App.css";
+import Register from "./Register";
+import Gallery from "./Gallery";
+import SignIn from "./SignIn";
+import useToken from "./useToken";
+import AuthService from "./services/AuthService";
 
 function App() {
-  const [images, setImages] = useState([]);
-  const [toastActive, setToastActive] = useState(false);
-
-  const toggleDeleteToast = useCallback(
-    () => setToastActive((active) => !active),
-    []
-  );
-
-  const toastMarkup = toastActive ? (
-    <Toast content="Image deleted" onDismiss={toggleDeleteToast} />
-  ) : null;
-
-  useEffect(() => {
-    fetch("http://localhost:3200/images", { method: "GET" })
-      .then((response) => response.json())
-      .then((data) => {
-        setImages(data);
-      })
-  }, []);
-
-  /**
-   * Handler for images added to file input
-   * @param {*} imgFiles list of files to be uploaded
-   */
-  function handleUploaderChange(imgFiles) {
-    const data = new FormData();
-
-    for (let image of imgFiles) {
-      data.append("files", image);
-    }
-
-    const requestOptions = {
-      method: "POST",
-      body: data,
-    };
-    fetch("http://localhost:3200/image/", requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
-        debugger
-        setImages([data, ...images]);
-      })
-      .catch((error) => console.error(error));
-  }
-
-  /**
-   * Delete image
-   * @param {*} e 
-   * @param {*} id 
-   */
-  function deleteImage(e, id) {
-    fetch(`http://localhost:3200/image/${id}`, { method: "DELETE" }).then((response) => response.json()).then(data => {
-      //Remove deleted image from state
-      setImages(images.filter((img) => img._id !== data.id));
-    })
-
-    // Show success toast
-    if (toastActive) {
-      // toggle Polaris toast off before toggling on again
-      toggleDeleteToast();
-      setTimeout(() => {
-        toggleDeleteToast();
-      }, 300);
-    } else {
-      toggleDeleteToast();
-    }
-  }
+  const { token, setToken } = useToken();
 
   return (
-    <AppProvider i18n={enTranslations}>
+    <AppProvider features={{ newDesignLanguage: true }} i18n={enTranslations}>
       <Frame>
-        <Page title="Kanika's Image Repo">
-          <Card sectioned className="toolbar">
-            <label className="upload">
-              <input
-                type="file"
-                name="image-uploader"
-                accept="image/*"
-                multiple
-                onChange={(e) => handleUploaderChange(e.target.files)}
-              />
-              <Icon source={AddImageMajor} />
-              <Heading>
-                Drag or click <span>here</span> to upload
-              </Heading>
-            </label>
-          </Card>
-          <Card sectioned>
-            {images.length === 0 && <Heading>There are no images</Heading>}
-            <div className="images">
-              {images.map(function (image, index) {
-                return (
-                  <div className="image-cell" key={index}>
-                    <div className="image-wrapper">
-                      <img alt={image.src} src={'http://localhost:3200' + image.src} />
-                      <Button
-                        destructive
-                        onClick={(e) => deleteImage(e, image._id)}
-                      >
-                        <Icon source={DeleteMajor} />
-                      </Button>
-                      <Heading className="image-filename">{image.name}</Heading>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </Card>
-        </Page>
-
-        {toastMarkup}
+        <BrowserRouter>
+          {!AuthService.getCurrentUser() && (
+            <Switch>
+              <Route path="/register">
+                <Register></Register>
+              </Route>
+              <Route path="/">
+                <SignIn setToken={setToken} />;
+              </Route>
+            </Switch>
+          )}
+          {AuthService.getCurrentUser() && (
+            <Switch>
+              <Route exact path="/">
+                <Redirect to="gallery"></Redirect>
+              </Route>
+              <Route exact path="/gallery">
+                <Gallery signOut={AuthService.signOut}></Gallery>
+              </Route>
+            </Switch>
+          )}
+        </BrowserRouter>
       </Frame>
     </AppProvider>
   );
