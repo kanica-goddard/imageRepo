@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:3200/auth/";
+const API_URL = "/auth/";
 
 class AuthService {
     register(user) {

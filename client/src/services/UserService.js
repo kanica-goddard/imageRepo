@@ -1,6 +1,6 @@
 import authHeader from "./authHeader";
 
-const API_URL = "http://localhost:3200/";
+const API_URL = "";
 
 class UserService {
     getImages(id) {
