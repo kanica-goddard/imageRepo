@@ -25,10 +25,9 @@ router.post("/user", (req, res) => {
             user.save()
                 .then((user) => {
                     res.json(user);
-                })
+                });
         }
-
-    })
+    });
 })
 
 //Route to process user's request and data when user submits signin form
@@ -47,14 +46,7 @@ router.post("/auth", (req, res) => {
                         if (isMatched) {
                             //Create session
                             req.session.userInfo = user;
-
                             res.json({});
-
-                            // res.cookie('name', 'user', {
-                            //     httpOnly: true,
-                            //     signed: true,
-                            // }).send();
-
                         }
                         else {
                             res.status(404).send("Sorry, your email and/or password is incorrect");
@@ -67,11 +59,10 @@ router.post("/auth", (req, res) => {
 })
 
 router.get("/signout", (req, res) => {
-
     req.session.destroy();
     res.send({
         user: null
-    })
-
+    });
 })
+
 module.exports = router;

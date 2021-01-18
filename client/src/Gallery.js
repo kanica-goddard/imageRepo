@@ -58,7 +58,6 @@ function Gallery({ signOut }) {
           toggleDeleteToast();
         }
       });
-
   }
 
   /**

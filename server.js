@@ -5,14 +5,14 @@ const mongoose = require("mongoose");
 const cors = require('cors');
 const path = require('path');
 
-//Loads environment variables from the keys.env
+// Loads environment variables from the keys.env
 require("dotenv").config({ path: "./config/keys.env" });
 
-//App object
+// App object
 const app = express();
 
-//Middleware 
-app.use(bodyParser.urlencoded({ extended: false })); //bodyparser middleware
+// Middleware 
+app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(cors());
 app.use(fileUpload());
@@ -23,8 +23,7 @@ app.use(express.static(path.join(__dirname, 'client/build')));
 // Serve images
 app.use(express.static('public'));
 
-//Load controllers
-const generalController = require("./controllers/general");
+// Load controllers
 const authController = require("./controllers/auth");
 const userController = require("./controllers/user");
 const imageController = require("./controllers/image");
@@ -38,7 +37,6 @@ app.use((req, res, next) => {
 });
 
 // Map each controller to the app express object
-app.use("/", generalController);
 app.use("/", authController);
 app.use("/", userController);
 app.use("/", imageController);
@@ -61,7 +59,7 @@ mongoose.connect(process.env.MONGO_DB_CONNECTION_STRING, {
     );
 
 const PORT = process.env.PORT;
-//Set up a server by calling the listen method
+// Set up a server by calling the listen method
 app.listen(PORT, () => {
     console.log(`Your web server has been connected to port ${PORT}.`);
 });

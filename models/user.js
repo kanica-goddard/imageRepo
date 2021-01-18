@@ -2,64 +2,46 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bcrypt = require("bcryptjs");
 
-//This indicates the shape of the documents that will be entering the database
 const userSchema = new Schema({
-
-
-    firstName:
-    {
+    firstName: {
         type: String,
         required: true
     },
-
-    lastName:
-    {
+    lastName: {
         type: String,
         required: true
     },
-
-    email:
-    {
+    email: {
         type: String,
         required: true
     },
-    password:
-    {
+    password: {
         type: String,
         required: true
     },
-
-    dateCreated:
-    {
+    dateCreated: {
         type: Date,
         default: Date.now()
     },
-    type:
-    {
+    type: {
         type: String,
         default: "User"
     }
 });
 
 userSchema.pre("save", function (next) {
-
-    //salt random generated characters or strings
+    //salt
     bcrypt.genSalt(10)
         .then((salt) => {
-
             bcrypt.hash(this.password, salt)
                 .then((encryptPassword) => {
                     this.password = encryptPassword;
                     next();
-
                 })
                 .catch(err => console.log(`Error occured while hashing ${err}`));
         })
         .catch(err => console.log(`Error occured while salting ${err}`));
-
-
-
 })
-const userModel = mongoose.model('User', userSchema);
 
+const userModel = mongoose.model('User', userSchema);
 module.exports = userModel;

@@ -6,7 +6,7 @@ const verifyToken = require("../middlewares/auth");
 
 //Routes
 
-//Shows all images
+//Shows all images for user
 router.get("/images/:id", [verifyToken], (req, res) => {
     const id = req.params.id;
     console.log("Get images for: " + id);
@@ -20,6 +20,11 @@ router.get("/images/:id", [verifyToken], (req, res) => {
         );
 });
 
+/**
+ * Helper function to save image to DB
+ * @param {*} req request
+ * @param {*} uploadedImage image to save
+ */
 const saveImage = async (req, uploadedImage) => {
     try {
         console.log("Save image: " + uploadedImage);

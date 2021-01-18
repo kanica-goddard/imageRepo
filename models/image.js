@@ -27,6 +27,5 @@ const imageSchema = new Schema({
     }
 });
 
-//Implementing this model allows you to perform CRUD operations
 const imageModel = mongoose.model("Image", imageSchema);
 module.exports = imageModel; 
