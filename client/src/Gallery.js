@@ -104,7 +104,7 @@ function Gallery({ signOut }) {
             return (
               <div className="image-cell" key={index}>
                 <div className="image-wrapper">
-                  <img alt={image.src} src={image.src} />
+                  <img alt={image.src} src={image.src} loading="lazy" />
                   <Button destructive onClick={(e) => deleteImage(e, image._id)}>
                     <Icon source={DeleteMajor} />
                   </Button>
