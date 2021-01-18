@@ -32,7 +32,7 @@ const saveImage = async (req, uploadedImage) => {
         //Build object
         const newImage = {
             name: uploadedImage.name,
-            src: `/images/${uploadedImage.name}`,
+            src: `/image_files/${uploadedImage.name}`,
             size: uploadedImage.size,
             userAccess: req.body.id
         }
@@ -44,7 +44,7 @@ const saveImage = async (req, uploadedImage) => {
         console.log(savedImage);
 
         //Move image to images folder
-        uploadedImage.mv(`public/images/${uploadedImage.name}`).then(() => {
+        uploadedImage.mv(`public/image_files/${uploadedImage.name}`).then(() => {
             console.log("Added to images folder");
         })
         // });
