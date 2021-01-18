@@ -45,7 +45,7 @@ app.use("/", authController);
 app.use("/", userController);
 app.use("/", imageController);
 
-// Catchall to send index.html file.=
+// Catchall to send index.html file
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname + '/client/build/index.html'));
 });
